@@ -87,3 +87,11 @@ div.tooltip {
   pointer-events: none;
   top:-100px;
 }
+
+.character {
+	
+	width:300px; 
+	background: lightgrey; 
+	border-top: 5px solid steelblue; 
+	margin: 5px;
+}

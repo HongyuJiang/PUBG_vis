@@ -1,4 +1,4 @@
-function createAttackRelations(attackEvents, characters, gamingTimeExtent){
+function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeTime){
 	
 	//console.log(attackEvents, characters)
 	
@@ -16,9 +16,9 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent){
 	})
 	
 	
-	let width = 750
+	let width = 850
 	
-	let height = 200
+	let height = 300
 	
 	let margin = 20
 	
@@ -34,14 +34,28 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent){
 	xAxis = g => g.attr("transform", `translate(0,${height - margin * 2})`)
 	.call(d3.axisBottom(xScale).ticks(20).tickFormat(d3.timeFormat("%M")))
 	
-	yAxis = g => g.attr("transform", `translate(${margin},0)`)
-	.call(d3.axisLeft(yScale))
+	yAxis = g => g.attr("transform", `translate(${width},0)`)
+	.call(d3.axisRight(yScale))
 	.call(g => g.select(".domain").remove())
 	
 	const svg = d3.select('#attackRelation')
 		.append('svg')
-		.attr('width', width)
+		.attr('width', width + 100)
 		.attr('height', height)
+		
+	defs = svg.append("defs")
+
+	defs.append("marker")
+		.attr("id", "triangle")
+		.attr("refX", 3)
+		.attr("refY", 3)
+		.attr("markerWidth", 15)
+		.attr("markerHeight", 15)
+		.attr("markerUnits","userSpaceOnUse")
+		.attr("orient", "auto")
+		.append("path")
+		.attr("d", "M 0 0 6 3 0 6 1.5 3")
+		.style("fill", "#FF665A");
 	
 	let curveGenerator = d3.line()
 	.curve(d3.curveBasis)
@@ -50,13 +64,13 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent){
 	
 	let xG = svg.append("g").call(xAxis)
 	
-	xG.selectAll('text').attr('fill','grey')
+	xG.selectAll('text').attr('fill','white')
 	xG.selectAll('path').attr('stroke','white')
 	xG.selectAll('line').attr('stroke','white')
 	
 	let yG = svg.append("g").call(yAxis)
 	
-	yG.selectAll('text').attr('fill','grey')	
+	yG.selectAll('text').attr('fill','white').attr('font-size', 8)
 	yG.selectAll('path').attr('stroke','white')
 	yG.selectAll('line').attr('stroke','white')
 	
@@ -65,20 +79,15 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent){
 	interactions.forEach(function(link){
 		
 		let x1 = xScale(link.time)
-		let y1 = yScale(link.sourceID)
+		let y1 = yScale(link.sourceName)
 		
 		let x3 = xScale(link.time)
-		let y3 = yScale(link.targetID)
+		let y3 = yScale(link.targetName)
 		
 		let x2 = xScale(link.time) + ((y3 - y1) / 10)
-		//if (link.sourceID > link.targetID)
-		//	x2 -= 20
-		
 		let y2 = (y3 + y1) / 2
 		
 		let points = [{'x':x1, 'y':y1},{'x':x2, 'y':y2},{'x':x3, 'y':y3}]
-		
-		console.log(points)
 		
 		curvePath.push({'points':points})
 	})
@@ -89,9 +98,38 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent){
 		.append('path')
 		.datum(d => d.points)
 		.attr('d', curveGenerator)
-		.attr('stroke', 'white')
-		.attr('stroke-opacity', 0.5)
+		.attr("marker-end", "url(#triangle)")
+		.attr('stroke', '#FF8C64')
+		.attr('stroke-opacity', 0.3)
 		.attr('stroke-width', 1)
 		.attr('fill', 'none')
+		
+	svg.selectAll('.lifeLine')
+		.data(characters)
+		.enter()
+		.append('line')
+		.attr('x1', margin)
+		.attr('y1', d => yScale(d))
+		.attr('x2', d => xScale(lifeTime[d]) - 10)
+		.attr('y2', d => yScale(d))
+		.attr('stroke', 'white')
+		.attr('stroke-opacity', '0.3')
+	
+	svg.append('rect')
+		.attr('width', 10)
+		.attr('height', height - margin * 3)
+		.attr('x', margin)
+		.attr('y', margin)
+		.attr('fill', '#FFF587')
+		.attr('stroke-opacity', '0.3')
+	
+	svg.selectAll('.lifeEndPoint')
+		.data(characters)
+		.enter()
+		.append('circle')
+		.attr('r', 3)
+		.attr('cx', d => xScale(lifeTime[d]) - 10)
+		.attr('cy', d => yScale(d))
+		.attr('fill', '#4371E8')
 		
 }

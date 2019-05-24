@@ -14,13 +14,19 @@ d3.json("./data/match_1.json").then(function(dataset){
 	
 	let attackEvents = []
 	
+	let charactersName = {}
+	
+	let PoisionDict = {}
+	
 	dataset.forEach(function(d){
 		//&& d.common.isGame == 1
 		if(d.character && d.common && d.common.isGame > 0){
 			
-			if (characterDict[d.character.accountId] == undefined)
-				characterDict[d.character.accountId] = []
-			characterDict[d.character.accountId].push(d)	
+			if (characterDict[d.character.name] == undefined)
+				characterDict[d.character.name] = []
+			characterDict[d.character.name].push(d)
+				
+			charactersName[d.character.name] = 1
 		}
 		
 		if(d._D){
@@ -41,10 +47,35 @@ d3.json("./data/match_1.json").then(function(dataset){
 		
 		actionDict[d._T] = 1
 		
-		if(d._T == 'LogPlayerTakeDamage')
+		if(d._T == 'LogPlayerTakeDamage'){
+			
 			attackEvents.push(d)
-		
+			
+		}
+			
+			
+		if(d._T == 'LogGameStatePeriodic'){
+					
+			let safetyZonePosition = d.gameState.safetyZonePosition
+			
+			let safetyZoneRadius = d.gameState.safetyZoneRadius
+			
+			let poisonGasWarningRadius = d.gameState.poisonGasWarningRadius
+			
+			if(Math.abs(poisonGasWarningRadius - safetyZoneRadius) < 500){
+				
+				let key = safetyZonePosition.x + '|' + safetyZonePosition.y
+				
+				let time = d._D
+				
+				PoisionDict[key] = {'position': safetyZonePosition, 'radius': safetyZoneRadius}
+			}
+			
+		}
+	
 	})
+	
+	
 	
 	let livedCharacters = d3.keys(characterDict).length
 	
@@ -59,7 +90,6 @@ d3.json("./data/match_1.json").then(function(dataset){
 		lifeTimeDict[character] = lifeTime
 	}
 	
-	//console.log(actionDict)
 	
 	gamingTimeExtent = d3.extent(timeArray)
 	
@@ -67,12 +97,11 @@ d3.json("./data/match_1.json").then(function(dataset){
 	
 	let persons = d3.keys(characterDict)
 	
-	createPersonGantt(gamingTimeExtent, characterDict[persons[15]])
+	createPersonGantt(gamingTimeExtent, characterDict[persons[13]])
 	
-	createAttackRelations(attackEvents, d3.keys(characterDict), gamingTimeExtent)
+	createAttackRelations(attackEvents, d3.keys(charactersName), gamingTimeExtent, lifeTimeDict)
 	
-	//addTrajectory(characterDict[persons[0]])
+	drawPoisionCircle(PoisionDict)
 	
-
-	
+	addPersonDetal([characterDict[persons[3]], characterDict[persons[4]], characterDict[persons[5]]])
 })

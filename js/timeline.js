@@ -1,5 +1,5 @@
 
-let timelineWidth = 800
+let timelineWidth = 850
 
 let timelineHeight = 200
 
@@ -11,15 +11,18 @@ function createTimeline(heatDict, lifeTimeDict){
 	
 	let rangeGapArray = []
 	
+	let personsNum = d3.keys(lifeTimeDict).length 	
+	
 	for(let key in heatDict){
 		
-		let time = new Date('2018-1-1 08:' + key.split('-')[0] + ':' + key.split('-')[1])
+		let time = new Date('2019-3-20 ' + key.split('-')[0] + ':' + key.split('-')[1] + ':00') 
 		
 		let heat = heatDict[key]
 		
 		heatArray.push({'time': time, 'heat': heat})
 	}
 	
+
 	for(let i =0; i<heatArray.length - 1;i++){
 		
 		rangeGapArray.push({
@@ -33,31 +36,39 @@ function createTimeline(heatDict, lifeTimeDict){
 	
 	let timelineXScale = d3.scaleTime()
 		.domain(d3.extent(heatArray, d => d.time))
-		.range([margin, timelineWidth - margin])
+		.range([margin, timelineWidth])
 		
 	let timelineYScale = d3.scaleLinear()
+		.domain([personsNum, 0])
+		.range([margin, timelineHeight - 2 * margin])
+		
+	let timelineZScale = d3.scaleLinear()
 		.domain([0, d3.max(heatArray, d => d.heat)])
-		.range([margin, timelineHeight - margin * 2])
+		.range([0,1])
 		
 	xAxis = g => g.attr("transform", `translate(0,${timelineHeight - margin * 2})`)
-	.call(d3.axisBottom(timelineXScale).ticks(15).tickFormat(d3.timeFormat("%M:%S")))
+		.call(d3.axisBottom(timelineXScale).ticks(15).tickFormat(d3.timeFormat("%M:%S")))
 	
 	yAxis = g => g.attr("transform", `translate(${margin},0)`)
-	.call(d3.axisLeft(timelineYScale))
-	.call(g => g.select(".domain").remove())
+		.call(d3.axisLeft(timelineYScale))
+		.call(g => g.select(".domain").remove())
 
 	const svg = d3.select('#timeline')
 		.append('svg')
 		.attr('width', timelineWidth)
 		.attr('height', timelineHeight)
 		
-	svg.append("g").call(xAxis)
-	.selectAll('text')
-	.attr('fill','grey')
+	let xG = svg.append("g").call(xAxis)
 	
-	svg.append("g").call(yAxis)
-	.selectAll('text')
-	.attr('fill','grey')
+	xG.selectAll('text').attr('fill','white')
+	xG.selectAll('path').attr('stroke','white')
+	xG.selectAll('line').attr('stroke','white')
+	
+	let yG = svg.append("g").call(yAxis)
+	
+	yG.selectAll('text').attr('fill','white')
+	yG.selectAll('path').attr('stroke','white')
+	yG.selectAll('line').attr('stroke','white')
 		
 	svg.selectAll('.timePot')
 		.data(rangeGapArray)
@@ -67,10 +78,41 @@ function createTimeline(heatDict, lifeTimeDict){
 		.attr('width', d => timelineXScale(d.end) - timelineXScale(d.start) - 3)
 		.attr('y', margin)
 		.attr('height', timelineHeight - margin * 3)
-		.attr('fill', 'white')
-		.attr('opacity', d =>  1 - timelineYScale(d.heat) / maxHeat)
+		.attr('fill', '#FF665A')
+		.attr('opacity', d =>  timelineZScale(d.heat))
+		
+	let livedPersonPoints = []
 	
-	lifeTimeDict
+	let lifeTimeArray = []
+	
+	for(let character in lifeTimeDict){
+		
+		lifeTimeArray.push(lifeTimeDict[character])
+	
+	}
+	
+	lifeTimeArray = lifeTimeArray.sort()
+	
+	lifeTimeArray.forEach(function(d){
+		
+		personsNum -= 1
+		livedPersonPoints.push({'time': d, 'livedNum': personsNum})
+	})
+	
+	
+	console.log(livedPersonPoints)
+	
+	let lineGenerator = d3.line()
+		.curve(d3.curveStep)
+		.x(d => timelineXScale(d.time) - 50)
+		.y(d => timelineYScale(d.livedNum))
+	
+	let l = svg.append('path')
+	.datum(livedPersonPoints.sort(d => d.time))
+	.attr('d', lineGenerator)
+	.attr('stroke','white')
+	.attr('fill','none')
 
+	console.log(l)
 }
 

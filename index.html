@@ -1,5 +1,6 @@
 
 <script src="libs/d3.v5.min.js"></script>
+<script src="js/compare.js"></script>
 <script src="js/attackRelations.js"></script>
 <script src="js/gantt.js"></script>
 <script src="js/map.js"></script>
@@ -8,21 +9,28 @@
 <link href="css/style.css" rel="stylesheet">
 <!------ Include the above in your HEAD tag ---------->
 
-<body style="background-color:#05194c">
+<body style="background-color:#051933">
 	
-	<div id="map_container"> 
+	<div id="map_container" style="margin-left:20px"> 
 		<img src='img/erangel.jpg' width=800 style='opacity:0.5;position:absolute'> 
 	</div>
 	<div id="timeline" style="position: absolute; top:800px"> </div>
 	
-	<div id="gantt" style="position: absolute; top:250px; right:50px"> </div>
+	<div id="gantt" style="position: absolute; top:430px; right:50px"> </div>
 	
-	<div id="attackRelation" style="position: absolute; top:50px; right:50px"> </div>
+	<div id="attackRelation" style="position: absolute; top:120px; right:50px"> </div>
 	
-	<div id="iconList" style="position: absolute; top:450px; right:100px; padding: 20px; margin: 20px;"> 
-		<img src='img/battle.png' width=80 style='opacity:1; background: whitesmoke;border-radius: 20px;padding:10px; margin: 50px;margin-top:0px;'> 
-		<img src='img/nuclear-energy%20(1).png' width=80 style='opacity:1;background: whitesmoke;border-radius: 20px;padding:10px; margin: 50px;margin-top:0px;'> 
-		<img src='img/open-parachute.png' width=80 style='opacity:1;background: whitesmoke;border-radius: 20px;padding:10px; margin: 50px;margin-top:0px;'> 
+	<div id="iconList" style="position: absolute; top:0px; left:900px; padding: 10px; margin: 10px;"> 
+		<img src='img/pubg.png' width=130 style='opacity:1; margin: 20px;margin-top:0px;'> 
+		<span style="display:-webkit-inline-box;color: white; font-size:30px; vertical-align: top; margin-right:100px"> 绝地求生可视分析系统 </br> PBUG Visual Analysis </span> 
+		<img src='img/battle.png' width=50 style='opacity:1; background: whitesmoke;border-radius: 20px;padding:10px; margin: 20px;margin-top:0px;'> 
+		<img src='img/nuclear-energy%20(1).png' width=50 style='opacity:1;background: whitesmoke;border-radius: 20px;padding:10px; margin: 20px;margin-top:0px;'> 
+		<img src='img/open-parachute.png' width=50 style='opacity:1;background: whitesmoke;border-radius: 20px;padding:10px; margin: 20px;margin-top:0px;'> 
+	</div>
+	
+	<div id="characterCard" style="overflow-x: auto; width:950px; display: -webkit-box; position: absolute; top:630px; opacity:0.9; left:920px;"> 
+
+
 	</div>
 	
 </body>

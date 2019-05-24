@@ -36,7 +36,8 @@ function addTrajectory(actionList){
 	svg.append('path')
 	.datum(pathList)
 	.attr('d', pathGeneration)
-	.attr('stroke', 'red')
+	.attr('stroke', 'steelblue')
+	.attr('stroke-width', '2')
 	.attr('fill', 'none')
 	
 	svg.selectAll('trajPoints')
@@ -46,6 +47,43 @@ function addTrajectory(actionList){
 	.attr('r', 2)
 	.attr('cx', d => xScale(d.x))
 	.attr('cy', d => yScale(d.y))
-	.attr('fill', 'yellow')
+	.attr('fill', 'white')
+	.attr('stroke', 'black')
+	.attr('stroke-width', '1')
+	
+}
+
+function drawPoisionCircle(poisionDict){
+	
+	poisionList = []
+	
+	for(let meta in poisionDict){
+		
+		poisionList.push(poisionDict[meta])
+	}
+	
+	const svg = d3.select('#map_container').select('svg')
+	
+	let cc = svg.selectAll('poisionCircles')
+	.data(poisionList)
+	.enter()
+	.append('circle')
+	.attr('r', d => d.radius/1000)
+	.attr('cx', d => d.position.x / 1000)
+	.attr('cy', d => d.position.y / 1000)
+	.attr('fill', 'red')
+	.attr('fill-opacity', '0.05')
+	.attr('stroke', '#933')
+	.attr('stroke-width', '2')
+	
+	console.log(cc)
+}
+
+function drawBattleField(){
+	
+	
+}
+
+function drawParachutePosition(){
 	
 }
