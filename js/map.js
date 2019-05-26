@@ -1,4 +1,13 @@
-function addTrajectory(actionList){
+const mapCanvas = d3.select('#map_container')
+		.append('svg')
+		.style('position', 'absolute')
+		.attr('width', 800)
+		.attr('height', 800)
+
+
+function addTrajectory(characterLog){
+	
+	let characterName = characterLog[0].character.name
 	
 	let width = 800
 	
@@ -20,6 +29,24 @@ function addTrajectory(actionList){
 	.x(d => xScale(d.x))
 	.y(d => yScale(d.y))
 	
+	actionList = []
+	
+	let LogSwitch = false
+	
+	characterLog.forEach(function(d){
+		
+		if(d._T == 'LogVaultStart'){
+			
+			LogSwitch = true
+		}
+		
+		if(LogSwitch){
+			
+			actionList.push({'time': new Date(d._D), 'action':d._T.split('Log')[1], 'health': d.character.health, 'location':d.character.location})
+		}
+		
+	})
+	
 	let pathList = []
 	
 	actionList.forEach(function(d){
@@ -27,20 +54,15 @@ function addTrajectory(actionList){
 		pathList.push(d.location)
 	})
 	
-	const svg = d3.select('#map_container')
-		.append('svg')
-		.style('position', 'absolute')
-		.attr('width', width)
-		.attr('height', height)
 		
-	svg.append('path')
+	mapCanvas.append('path')
 	.datum(pathList)
 	.attr('d', pathGeneration)
-	.attr('stroke', 'steelblue')
+	.attr('stroke', CharacterShader(characterName))
 	.attr('stroke-width', '2')
 	.attr('fill', 'none')
 	
-	svg.selectAll('trajPoints')
+	mapCanvas.selectAll('trajPoints')
 	.data(pathList)
 	.enter()
 	.append('circle')
@@ -61,10 +83,8 @@ function drawPoisionCircle(poisionDict){
 		
 		poisionList.push(poisionDict[meta])
 	}
-	
-	const svg = d3.select('#map_container').select('svg')
-	
-	let cc = svg.selectAll('poisionCircles')
+
+	let cc = mapCanvas.selectAll('poisionCircles')
 	.data(poisionList)
 	.enter()
 	.append('circle')

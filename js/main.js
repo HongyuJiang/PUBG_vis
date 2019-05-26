@@ -1,3 +1,5 @@
+let CharacterShader = d3.scaleOrdinal(d3.schemeSet2);
+
 d3.json("./data/match_1.json").then(function(dataset){
 	
 	let characterDict = {}
@@ -97,11 +99,19 @@ d3.json("./data/match_1.json").then(function(dataset){
 	
 	let persons = d3.keys(characterDict)
 	
-	createPersonGantt(gamingTimeExtent, characterDict[persons[13]])
+	createPersonGantt(gamingTimeExtent, characterDict[persons[1]])
 	
 	createAttackRelations(attackEvents, d3.keys(charactersName), gamingTimeExtent, lifeTimeDict)
 	
 	drawPoisionCircle(PoisionDict)
 	
 	addPersonDetal([characterDict[persons[3]], characterDict[persons[4]], characterDict[persons[5]]])
+	
+	addTrajectory(characterDict[persons[1]])
+	
+	addTrajectory(characterDict[persons[4]])
+	
+	addTrajectory(characterDict[persons[7]])
+	
+	//addTrajectory(characterDict[persons[4]])
 })
