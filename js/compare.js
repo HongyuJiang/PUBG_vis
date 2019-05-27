@@ -1,6 +1,5 @@
 function addPersonDetal(characterRecords){
-	
-	console.log(characterRecords)
+
 
 	let Equipments = {}
 	
@@ -58,6 +57,7 @@ function addPersonDetal(characterRecords){
 		.enter()
 		.append('div')
 		.attr('class', 'character')
+		.style('border-top', d => '5px solid ' + CharacterShader(d.name))
 	
 	containers
 		.append('svg')

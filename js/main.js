@@ -1,5 +1,7 @@
 let CharacterShader = d3.scaleOrdinal(d3.schemeSet2);
 
+var globalCharacterDict = {}
+
 d3.json("./data/match_1.json").then(function(dataset){
 	
 	let characterDict = {}
@@ -22,7 +24,7 @@ d3.json("./data/match_1.json").then(function(dataset){
 	
 	dataset.forEach(function(d){
 		//&& d.common.isGame == 1
-		if(d.character && d.common && d.common.isGame > 0){
+		if(d.character){
 			
 			if (characterDict[d.character.name] == undefined)
 				characterDict[d.character.name] = []
@@ -31,14 +33,29 @@ d3.json("./data/match_1.json").then(function(dataset){
 			charactersName[d.character.name] = 1
 		}
 		
+		if(d.attacker && characterDict[d.attacker.name]){
+			
+			//console.log(d)
+			
+			d.character = d.attacker
+			
+			if (characterDict[d.attacker.name] == undefined)
+				characterDict[d.attacker.name] = []
+			characterDict[d.attacker.name].push(d)
+				
+			charactersName[d.attacker.name] = 1
+		}
+		
 		if(d._D){
 			
-			timeArray.push(new Date(d._D))
+			d._D = new Date(d._D)
+			
+			timeArray.push(d._D)
 		}
 		
 		if(d._T == 'LogPlayerAttack'){
 			
-			let time = new Date(d._D)
+			let time = d._D
 			
 			let stamp = time.getHours() + '-' + time.getMinutes()
 			
@@ -50,7 +67,7 @@ d3.json("./data/match_1.json").then(function(dataset){
 		actionDict[d._T] = 1
 		
 		if(d._T == 'LogPlayerTakeDamage'){
-			
+				
 			attackEvents.push(d)
 			
 		}
@@ -68,8 +85,6 @@ d3.json("./data/match_1.json").then(function(dataset){
 				
 				let key = safetyZonePosition.x + '|' + safetyZonePosition.y
 				
-				let time = d._D
-				
 				PoisionDict[key] = {'position': safetyZonePosition, 'radius': safetyZoneRadius}
 			}
 			
@@ -77,14 +92,11 @@ d3.json("./data/match_1.json").then(function(dataset){
 	
 	})
 	
-	
-	
 	let livedCharacters = d3.keys(characterDict).length
 	
 	for(let character in characterDict){
 		
 		let lifeTime = d3.max(characterDict[character], d => {
-			
 			return new Date(d._D)
 		})
 		
@@ -92,26 +104,27 @@ d3.json("./data/match_1.json").then(function(dataset){
 		lifeTimeDict[character] = lifeTime
 	}
 	
+	globalCharacterDict = characterDict
 	
-	gamingTimeExtent = d3.extent(timeArray)
+	globalGamingTimeExtent = d3.extent(timeArray)
 	
-	createTimeline(heatTimeDict, lifeTimeDict)
+	createTimeline( heatTimeDict, lifeTimeDict)
 	
 	let persons = d3.keys(characterDict)
 	
-	createPersonGantt(gamingTimeExtent, characterDict[persons[1]])
+	createPersonGantt(characterDict[persons[10]])
 	
-	createAttackRelations(attackEvents, d3.keys(charactersName), gamingTimeExtent, lifeTimeDict)
+	createAttackRelations(attackEvents, d3.keys(charactersName), lifeTimeDict)
 	
 	drawPoisionCircle(PoisionDict)
 	
-	addPersonDetal([characterDict[persons[3]], characterDict[persons[4]], characterDict[persons[5]]])
+	addPersonDetal([characterDict['es_AS-LCOB_05'], characterDict['TiTi_deFenSe'], characterDict['Life_XnfzZ']])
 	
-	addTrajectory(characterDict[persons[1]])
+	for(let character in characterDict){
+		
+		addTrajectory(characterDict[character])
+	}
 	
-	addTrajectory(characterDict[persons[4]])
+	//addTrajectory(characterDict['es_AS-LCOB_05'])
 	
-	addTrajectory(characterDict[persons[7]])
-	
-	//addTrajectory(characterDict[persons[4]])
 })

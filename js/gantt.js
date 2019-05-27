@@ -1,4 +1,6 @@
-function createPersonGantt(gamingTimeExtent, characterLog){
+function createPersonGantt(characterLog){
+	
+	d3.select('#gantt').selectAll('*').remove()
 	
 	let actionColorizer = d3.scaleOrdinal(d3.schemeSet2);
 	
@@ -6,10 +8,17 @@ function createPersonGantt(gamingTimeExtent, characterLog){
 	
 	let actions = {}
 	
+	let landingAction = {}
+	
 	characterLog.forEach(function(d){
 		
-		//if(d._T != 'LogPlayerPosition' && d._T != 'LogVehicleRide'){
-		if(1){	
+		if(d._T == 'LogParachuteLanding'){
+			
+			landingAction = d
+		}
+		
+		if(d._T != 'LogPlayerPosition' && d._T != 'LogVehicleLeave' && d._T != 'LogParachuteLanding'){
+		//if(1){	
 			actions[d._T.split('Log')[1]] = 1
 		
 			actionList.push({'time': new Date(d._D), 'action':d._T.split('Log')[1], 'health': d.character.health, 'location':d.character.location})
@@ -23,8 +32,10 @@ function createPersonGantt(gamingTimeExtent, characterLog){
 	
 	let margin = 30
 	
+	console.log(globalGamingTimeExtent)
+	
 	let xScale = d3.scaleTime()
-		.domain(gamingTimeExtent)
+		.domain(globalGamingTimeExtent)
 		.range([margin * 4, width - margin])
 		
 	let yScale = d3.scalePoint()
@@ -61,7 +72,7 @@ function createPersonGantt(gamingTimeExtent, characterLog){
 		.append('rect')
 		.attr('x', d => xScale(d.time))
 		.attr('y', d => yScale(d.action))
-		.attr('width', 5)
+		.attr('width', 4)
 		.attr('height', 3)
 		.attr('fill', d => actionColorizer(d.action))
 		.attr('stroke-opacity', 1)
@@ -77,6 +88,11 @@ function createPersonGantt(gamingTimeExtent, characterLog){
 		.attr('opacity', 0.3)
 		.text(characterLog[0].character.name)
 	
-		
+	svg.append('rect')
+		.attr('x', xScale(new Date(landingAction._D)) - 3)
+		.attr('y', margin) 
+		.attr('width', 3)
+		.attr('height', height - 2*margin)
+		.attr('fill', 'red')
 	
 }

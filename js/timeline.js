@@ -35,8 +35,8 @@ function createTimeline(heatDict, lifeTimeDict){
 	let maxHeat = d3.max(heatArray, d => d.heat)
 	
 	let timelineXScale = d3.scaleTime()
-		.domain(d3.extent(heatArray, d => d.time))
-		.range([margin, timelineWidth])
+		.domain(globalGamingTimeExtent)
+		.range([margin, timelineWidth - margin])
 		
 	let timelineYScale = d3.scaleLinear()
 		.domain([personsNum, 0])
@@ -47,7 +47,7 @@ function createTimeline(heatDict, lifeTimeDict){
 		.range([0,1])
 		
 	xAxis = g => g.attr("transform", `translate(0,${timelineHeight - margin * 2})`)
-		.call(d3.axisBottom(timelineXScale).ticks(15).tickFormat(d3.timeFormat("%M:%S")))
+		.call(d3.axisBottom(timelineXScale).ticks(15).tickFormat(d3.timeFormat("%M")))
 	
 	yAxis = g => g.attr("transform", `translate(${margin},0)`)
 		.call(d3.axisLeft(timelineYScale))
@@ -58,6 +58,13 @@ function createTimeline(heatDict, lifeTimeDict){
 		.attr('width', timelineWidth)
 		.attr('height', timelineHeight)
 		
+	var brush = d3.brushX()
+        .extent([
+            [0, margin],
+            [timelineWidth, timelineHeight - 2 * margin]
+        ])
+        .on("brush end", brushed);
+
 	let xG = svg.append("g").call(xAxis)
 	
 	xG.selectAll('text').attr('fill','white')
@@ -99,20 +106,32 @@ function createTimeline(heatDict, lifeTimeDict){
 		livedPersonPoints.push({'time': d, 'livedNum': personsNum})
 	})
 	
-	
-	console.log(livedPersonPoints)
-	
 	let lineGenerator = d3.line()
 		.curve(d3.curveStep)
-		.x(d => timelineXScale(d.time) - 50)
+		.x(d => timelineXScale(d.time))
 		.y(d => timelineYScale(d.livedNum))
 	
 	let l = svg.append('path')
 	.datum(livedPersonPoints.sort(d => d.time))
 	.attr('d', lineGenerator)
 	.attr('stroke','white')
+	.attr('stroke-width', 2)
 	.attr('fill','none')
-
-	console.log(l)
+			
+	svg.append("g")
+		.attr("class", "brush")
+		.call(brush);
+	
+	function brushed(){
+		
+		let extent = d3.event.selection.map(timelineXScale.invert)
+		
+		removeAllTrajectories()
+		
+		for(let character in globalCharacterDict){
+			
+			addTrajectory(globalCharacterDict[character], extent)
+		}
+	}
 }
 

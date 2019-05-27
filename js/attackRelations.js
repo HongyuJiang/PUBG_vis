@@ -1,6 +1,4 @@
-function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeTime){
-	
-	//console.log(attackEvents, characters)
+function createAttackRelations(attackEvents, characters, lifeTime){
 	
 	let interactions = []
 	
@@ -23,7 +21,7 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeT
 	let margin = 20
 	
 	let xScale = d3.scaleTime()
-		.domain(gamingTimeExtent)
+		.domain(globalGamingTimeExtent)
 		.range([margin, width - margin])
 		
 		
@@ -89,17 +87,20 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeT
 		
 		let points = [{'x':x1, 'y':y1},{'x':x2, 'y':y2},{'x':x3, 'y':y3}]
 		
-		curvePath.push({'points':points})
+		curvePath.push({'points':points, 'source':link.sourceName, 'target':link.targetName})
 	})
 		
 	svg.selectAll('.interactionLine')
 		.data(curvePath)
 		.enter()
 		.append('path')
+		.attr('source', d => d.source)
+		.attr('target', d => d.target)
 		.datum(d => d.points)
 		.attr('d', curveGenerator)
+		.attr('class', 'interactionLine')
 		.attr("marker-end", "url(#triangle)")
-		.attr('stroke', '#FF8C64')
+		.attr('stroke', 'white')
 		.attr('stroke-opacity', 0.3)
 		.attr('stroke-width', 1)
 		.attr('fill', 'none')
@@ -116,11 +117,11 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeT
 		.attr('stroke-opacity', '0.3')
 	
 	svg.append('rect')
-		.attr('width', 10)
+		.attr('width', 5)
 		.attr('height', height - margin * 3)
 		.attr('x', margin)
 		.attr('y', margin)
-		.attr('fill', '#FFF587')
+		.attr('fill', 'grey')
 		.attr('stroke-opacity', '0.3')
 	
 	svg.selectAll('.lifeEndPoint')
@@ -130,6 +131,12 @@ function createAttackRelations(attackEvents, characters, gamingTimeExtent, lifeT
 		.attr('r', 3)
 		.attr('cx', d => xScale(lifeTime[d]) - 10)
 		.attr('cy', d => yScale(d))
-		.attr('fill', '#4371E8')
+		.attr('fill', '#FFDE6B')
+		
+	svg.selectAll('.tick').select('text')
+	.on('click', function(d){
+		
+		createPersonGantt(globalCharacterDict[d])
+	})
 		
 }
