@@ -117,14 +117,12 @@ d3.json("./data/match_1.json").then(function(dataset){
 	createAttackRelations(attackEvents, d3.keys(charactersName), lifeTimeDict)
 	
 	drawPoisionCircle(PoisionDict)
-	
-	addPersonDetal([characterDict['es_AS-LCOB_05'], characterDict['TiTi_deFenSe'], characterDict['Life_XnfzZ']])
-	
-	for(let character in characterDict){
+
+	//for(let character in characterDict){
 		
-		addTrajectory(characterDict[character])
-	}
+	//	addTrajectory(characterDict[character])
+	//}
 	
-	//addTrajectory(characterDict['es_AS-LCOB_05'])
+	addTrajectory(characterDict['es_AS-LCOB_05'])
 	
 })

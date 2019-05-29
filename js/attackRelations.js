@@ -137,6 +137,8 @@ function createAttackRelations(attackEvents, characters, lifeTime){
 	.on('click', function(d){
 		
 		createPersonGantt(globalCharacterDict[d])
+
+		addPersonDetal([globalCharacterDict[d]])
 	})
 		
 }
